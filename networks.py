@@ -40,6 +40,19 @@ class _Residual_Block(nn.Module):
         output = self.relu2(self.bn2(torch.add(output,identity_data)))
         return output 
 
+### Helper Function
+def define_E(opt: Namespace):
+    if opt.net_E == 'vanilla':
+        return Encoder(**opt.net_E_params)
+    else:
+        raise NotImplementedError
+
+def define_D(opt: Namespace):
+    if opt.net_D == 'vanilla':
+        return Decoder(**opt.net_D_params)
+    else:
+        raise ValueError('Undefined model type')
+
 class Encoder(nn.Module):
     def __init__(self, cdim=3, hdim=512, channels=[64, 128, 256, 512, 512, 512], image_size=256):
         super(Encoder, self).__init__() 
@@ -102,14 +115,18 @@ class Decoder(nn.Module):
   
         
 class IntroVAE(nn.Module):
-    def __init__(self, cdim=3, hdim=512, channels=[64, 128, 256, 512, 512, 512], image_size=256):
+    def __init__(self, opt):
         super(IntroVAE, self).__init__()         
+        self.opt = opt
+
+        #cdim=3, hdim=512, channels=[64, 128, 256, 512, 512, 512], image_size=256
+
+        self.hdim = self.opt.hdim
         
-        self.hdim = hdim
+        self.encoder = define_E(opt)
+        #cdim, hdim, channels, image_size for both
         
-        self.encoder = Encoder(cdim, hdim, channels, image_size)
-        
-        self.decoder = Decoder(cdim, hdim, channels, image_size)
+        self.decoder = define_D(opt)
         
       
     def forward(self, x):        
@@ -154,5 +171,3 @@ class IntroVAE(nn.Module):
             error = error.sum()
                
         return error
-        
-

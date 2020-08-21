@@ -13,6 +13,7 @@ from torch.utils.data import DataLoader
 from dataset import *
 import time
 import numpy as np
+import pandas as pd
 import torchvision.utils as vutils
 from torch.autograd import Variable
 from networks import *
@@ -20,9 +21,29 @@ from math import log10
 import torchvision
 import torch.nn.functional as F
 from torchvision.utils import make_grid, save_image
+
+from pytorch_lightning import Trainer, seed_everything
+from pytorch_lightning.loggers import TensorBoardLogger
+from pytorch_lightning.callbacks import ModelCheckpoint
 # from tensorboardX import SummaryWriter
 
-parser = argparse.ArgumentParser()
+### Helper Functions
+def printConfig(config: dict):
+    print('------------------- Options -----------------')
+    for key1 in config.keys():
+        print(key1+':')
+
+        for val1 in config[key1]:
+            if isinstance(config[key1][val1], dict):
+                print('\t%s: ' % (val1))
+                for val2 in config[key1][val1]:
+                    print('\t\t%s: ' % val2 + str(config[key1][val1][val2]))
+            else:
+                print('\t%s: ' % val1 + str(config[key1][val1]))
+        print()
+    print('------------------- End -------------------')
+
+parser = ArgumentParser(description='Generic Runner for Image Classification')
 parser.add_argument('--lr_e', type=float, default=0.0002, help='learning rate of the encoder, default=0.0002')
 parser.add_argument('--lr_g', type=float, default=0.0002, help='learning rate of the generator, default=0.0002')
 parser.add_argument("--num_vae", type=int, default=0, help="the epochs of pretraining a VAE, Default=0")
@@ -58,6 +79,16 @@ parser.add_argument('--outf', default='results/', help='folder to output images 
 parser.add_argument('--manualSeed', type=int, help='manual seed')
 parser.add_argument('--tensorboard', action='store_true', help='enables tensorboard')
 parser.add_argument("--pretrained", default="", type=str, help="path to pretrained model (default: none)")
+parser.add_argument('--project', '-p', default='wilms', help='Path to project folder')
+parser.add_argument('--config', '-c', default='wilms_w_gpu_ddp.yaml', help='path to the config file')#, default='./configs/mnist.yaml')
+
+### Loading Config YAML
+args = parser.parse_args()
+config_src = os.path.join('./configs', args.project, args.config)
+config = yaml.safe_load(open(config_src, 'r'))
+printConfig(config)
+for k in config:
+    exec('{KEY} = {VALUE}'.format(KEY = k, VALUE = repr(Namespace(**config[k]))))
 
 str_to_list = lambda x: [int(xi) for xi in x.split(',')]
 

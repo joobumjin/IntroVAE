@@ -25,17 +25,11 @@ opt:
   workers: 12
   batchSize: 16 
   input_height: 256
-  input_width: null
   output_height: 256
-  output_width: null
-  crop_height: null
-  crop_width: null
   nEpochs: 500 
   start_epoch: 0  
-  cuda: True
+  cuda: False
   outf: ./logs/
-
-  manualSeed: null
 
   net_E_params:
     cdim: 3

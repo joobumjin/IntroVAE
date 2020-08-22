@@ -72,15 +72,15 @@ parser.add_argument("--start_epoch", default=1, type=int, help="Manual epoch num
 parser.add_argument('--lr', type=float, default=0.0002, help='learning rate, default=0.0002')
 parser.add_argument('--beta1', type=float, default=0.5, help='beta1 for adam. default=0.5')
 parser.add_argument("--momentum", default=0.9, type=float, help="Momentum, Default: 0.9")
-parser.add_argument('--clip', type=float, default=100, help='the threshod for clipping gradient')
+parser.add_argument('--clip', type=float, default=100, help='the threshold for clipping gradient')
 parser.add_argument("--step", type=int, default=500, help="Sets the learning rate to the initial LR decayed by momentum every n epochs, Default: n=500")
-parser.add_argument('--cuda', action='store_true', help='enables cuda')
+parser.add_argument('--cuda', type=bool, default=False, help='enables cuda')
 parser.add_argument('--outf', default='results/', help='folder to output images and model checkpoints')
 parser.add_argument('--manualSeed', type=int, help='manual seed')
 parser.add_argument('--tensorboard', action='store_true', help='enables tensorboard')
 parser.add_argument("--pretrained", default="", type=str, help="path to pretrained model (default: none)")
 parser.add_argument('--project', '-p', default='wilms', help='Path to project folder')
-parser.add_argument('--config', '-c', default='wilms_w_gpu_ddp.yaml', help='path to the config file')#, default='./configs/mnist.yaml')
+parser.add_argument('--config', '-c', default='wilms_w_gpu.yaml', help='path to the config file')#, default='./configs/mnist.yaml')
 
 ### Loading Config YAML
 args = parser.parse_args()
@@ -108,8 +108,9 @@ def record_image(writer, image_list, cur_iter):
 def main():
     
     global opt, model
-    opt = parser.parse_args()
-    print(opt)
+    #opt = parser.parse_args()
+    #print(opt)
+    opt = config
 
     try:
         os.makedirs(opt.outf)

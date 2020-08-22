@@ -119,8 +119,6 @@ class IntroVAE(nn.Module):
         super(IntroVAE, self).__init__()         
         self.opt = opt
 
-        #cdim=3, hdim=512, channels=[64, 128, 256, 512, 512, 512], image_size=256
-
         self.hdim = self.opt.hdim
         
         self.encoder = define_E(opt)
